@@ -1,5 +1,5 @@
 # Use a lightweight Node.js image
-FROM node:18-alpine
+FROM docker.io/library/node:18-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Use Nginx to serve the built React app
-FROM nginx:alpine
+FROM docker.io/library/nginx:alpine
 COPY --from=0 /app/build /usr/share/nginx/html
 
 # Expose port 80
