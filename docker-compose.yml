@@ -1,0 +1,50 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+
+  frontent:
+    image: ghcr.io/osu-justicetech/truancytwo:main
+    networks:
+      - web
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.t2.rule=Host(`DOMAIN`)"
+      - "traefik.http.routers.t2.service=t2"
+      - "traefik.http.services.t2.loadbalancer.server.port=80"
+      - "traefik.http.routers.t2.entryPoints=websecure"
+      - "traefik.http.routers.t2.tls=true"
+      - "traefik.http.routers.t2.tls.certresolver=le"
+
+  backend:
+    image: ghcr.io/osu-justicetech/truancytwo-backend:main
+    networks:
+      - web
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.t2b.rule=Host(`DOMAIN`) && ( ( ( Path(`/api/health`) || Path(`/api/data`) ) && Method(`GET`) ) || (Method(`POST`) && ( Path(`/api/reviews`) || Path(`/api/click`) ) ) )"
+      - "traefik.http.routers.t2b.service=t2b"
+      - "traefik.http.services.t2b.loadbalancer.server.port=3000"
+      - "traefik.http.routers.t2b.entryPoints=websecure"
+      - "traefik.http.routers.t2b.tls=true"
+      - "traefik.http.routers.t2b.tls.certresolver=le"
+
+      - "traefik.http.routers.t2a.rule=Host(`DOMAIN`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.t2a.service=t2b"
+      - "traefik.http.routers.t2a.entryPoints=websecure"
+      - "traefik.http.routers.t2a.tls=true"
+      - "traefik.http.routers.t2a.tls.certresolver=le"
+      - "traefik.http.routers.t2a.middlewares=truancyauth"
+      - "traefik.http.middlewares.truancyauth.basicauth.users=admin:$$2y$$05$$######"
+
+
+networks:
+  web:
+    external: true
+
+volumes:
+  mongodb_data:
