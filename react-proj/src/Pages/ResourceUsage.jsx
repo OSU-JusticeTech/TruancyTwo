@@ -11,14 +11,14 @@ const ResourceUsage = () => {
 
   useEffect(() => {
     // Fetch reviews data
-        fetch('http://localhost:3000/reviews')
+        fetch('/api/reviews')
     //fetch('http://truancy2backend-service:3030/reviews')
       .then((response) => response.json())
       .then((json) => setReviewData(json))
       .catch((error) => console.error('Error fetching review data:', error));
 
     // Fetch clicks data
-        fetch('http://localhost:3000/clicks')
+        fetch('/api/clicks')
     //fetch('http://truancy2backend-service:3030/clicks')
       .then((response) => response.json())
       .then((json) => setClickData(json))

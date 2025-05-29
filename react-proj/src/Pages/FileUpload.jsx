@@ -40,7 +40,7 @@ const FileUpload = () => {
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         const jsonPayload = JSON.stringify({ data: jsonData });
 
-        const response = await axios.post('http://localhost:3000/upload', jsonPayload, {
+        const response = await axios.post('/api/upload', jsonPayload, {
           headers: {
             'Content-Type': 'application/json'
           }
