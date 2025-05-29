@@ -8,8 +8,8 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/testingAgainPt3', {
-//mongoose.connect('mongodb://mongodb:27017/dataStore', {
+//mongoose.connect('mongodb://localhost:27017/testingAgainPt3', {
+mongoose.connect('mongodb://mongodb:27017/dataStore', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -46,11 +46,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Root route
-app.get('/', (req, res) => {
+app.get('/api/', (req, res) => {
     res.send('Welcome to the Data Storage App!');
 });
 
-app.post('/upload', upload.single('file'), async (req, res) => {
+app.post('/api/upload', upload.single('file'), async (req, res) => {
     try {
         let jsonData;
 
@@ -80,7 +80,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
 
 // Route to retrieve stored data from MongoDB
-app.get('/data', (req, res) => {
+app.get('/api/data', (req, res) => {
     DataModel.find()
         .then((data) => {
             return res.status(200).send({ data: data });
@@ -90,7 +90,7 @@ app.get('/data', (req, res) => {
         });
 });
 
-app.get('/health', async (req, res) => {
+app.get('/api/health', async (req, res) => {
     const mongoState = mongoose.connection.readyState;
     const isConnected = mongoState === 1; // 0: disconnected, 1: connected, 2: connecting, 3: disconnecting
 
@@ -112,7 +112,7 @@ const reviewSchema = new mongoose.Schema({
 const Review = mongoose.model('Review', reviewSchema);
 
 
-app.post('/reviews', async (req, res) => {
+app.post('/api/reviews', async (req, res) => {
     const { link, rating, comment } = req.body;
 
     if (typeof link !== 'string' || typeof rating !== 'number' || typeof comment !== 'string') {
@@ -130,7 +130,7 @@ app.post('/reviews', async (req, res) => {
 });
 
 
-app.get('/reviews', async (req, res) => {
+app.get('/api/reviews', async (req, res) => {
     try {
         // Get all reviews, sorting by createdAt in descending order
         const reviews = await Review.find().sort({ createdAt: -1 });
@@ -152,7 +152,7 @@ const clickTrackingSchema = new mongoose.Schema({
 const ClickTracking = mongoose.model('ClickTracking', clickTrackingSchema);
 
 
-app.post('/click', async (req, res) => {
+app.post('/api/click', async (req, res) => {
     const { link } = req.body;
 
     if (typeof link !== 'string' || link.trim() === '') {
@@ -173,7 +173,7 @@ app.post('/click', async (req, res) => {
     }
 });
 
-app.get('/clicks', async (req, res) => {
+app.get('/api/clicks', async (req, res) => {
     try {
         const trackingData = await ClickTracking.find().sort({ clicks: -1 });
         res.status(200).send({ tracking: trackingData });
